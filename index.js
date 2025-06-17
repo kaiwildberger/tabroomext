@@ -16,7 +16,9 @@ TODO
 [ ] turn on/off more Features (not visual fixes maybe) in the menu. google.com How to Persist Data Across Extension Firefox
   [x] stupid
 [x] clicking Tabbing tab defaults to status
+    [x] change title too
 [x] codes to watch in pairings
+ [ ] extend to speech chart
 
 
 official feature list:
@@ -31,7 +33,7 @@ judge chart:
 defaults on top tabs (can still mouseover and select tho ofc)    
     entries tab defaults to schools
     tabbing tab defaults to status
-
+"Codes to Watch" in pairings view
 
 
 
@@ -154,10 +156,17 @@ tab.addEventListener("mousedown", () => {
     window.location.href = tablink.getAttribute("href")
 })
 
-// codes to watch in pairings
+// "STATUS PAGE TITLE"
+if(stringlocation.includes("tabbing/status/dashboard.mhtml")) {
+    document.title = "Status"
+}
+
+// "CODES TO WATCH IN PAIRINGS"
 
 const codematch = /(\d{3,4})/g // what are code specs? max 5???
 if(stringlocation.includes("/tourn/postings/round.mhtml")) {
+    let debate = document.querySelector("thead").innerText.includes("Neg") | document.querySelector("thead").innerText.includes("Aff")
+    let header = document.getElementById("tabnav").nextElementSibling.children[0]
     function searchContent(content) {
         let table = document.querySelector('tbody')
         Array.from(table.children).forEach(e => {
@@ -167,20 +176,42 @@ if(stringlocation.includes("/tourn/postings/round.mhtml")) {
             }
         })
     }
-    let saved = localStorage.getItem("watchcodes")
-    if(saved.length > 0) { searchContent(saved) }
-    document.querySelector("div.nospace.flexrow > span.half").innerHTML += `<div><span>Search space-separated codes </span><input type="text" id="tabext-search"></div>`
+    function searchSpeech(content) {
+        let table = document.querySelector('tbody')
+        Array.from(table.children).forEach(e => {
+            // console.log(content)
+            let codes = e.children[3].innerText.match(codematch)
+            codes.forEach(m => { // m is a single code entered in the field
+                if(content.includes(m)) {
+                    // console.log(m)
+                    table.insertBefore(e, table.firstChild)
+                }
+            })
+        })
+    }
+    header.innerHTML += `<div><span>Search space-separated codes </span><input type="text" id="tabext-search"></div>`
     let search = document.getElementById("tabext-search")
+    // does this fix the null init
+    let saved = (debate) ? localStorage.getItem("watchcodes_d") : localStorage.getItem("watchcodes_s")
+    if(saved === "") { // <empty string>
+
+    }
+    if(saved.length > 0) {
+        if(debate) searchContent(saved);
+        else searchSpeech(saved);
+    }
     if(saved.length > 0) { search.value = saved }
     // search.style.width = "100px !important" // these straight up are Not working
     // search.style.display = "inline"
     // me when swift guard let
     search.addEventListener("input", () => {
         let content = search.value
-        searchContent(content)
+        if(debate) searchContent(content);
+        else searchSpeech(content);
     })
     window.addEventListener("beforeunload", () => {
-        localStorage.setItem("watchcodes", search.value)
+        if(debate) localStorage.setItem("watchcodes_d", search.value);
+        else localStorage.setItem("watchcodes_s", search.value);
     })
     // would be nice if this worked
     document.addEventListener("input", e => {

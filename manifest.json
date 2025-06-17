@@ -1,0 +1,25 @@
+{
+    "manifest_version": 2,
+    "name": "Tabroom improved (kai's version)",
+    "version": "0.1",
+    "description": "Tabroom.com keyboard shortcuts and various very simple QOL improvements",
+    "icons": {
+      "906": "icon.png"
+    },
+    "browser_action": {
+        "default_popup": "popup.html"
+    },
+    "content_scripts": [
+      {
+        "matches": ["*://*.tabroom.com/*"],
+        "js": ["index.js"]
+      }
+    ],
+    "permissions": ["tabs"],
+    "browser_specific_settings": {
+      "gecko": {
+          "id": "kiawildberger@gmail.com"
+      }
+  }
+  }
+  

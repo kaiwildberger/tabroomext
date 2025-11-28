@@ -19,6 +19,7 @@ TODO
     [x] change title too
 [x] codes to watch in pairings
  [ ] extend to speech chart
+[ ] resize grid cursor comes up on "school dashboard and results" reviewing student ballots
 
 
 official feature list:
@@ -34,8 +35,6 @@ defaults on top tabs (can still mouseover and select tho ofc)
     entries tab defaults to schools
     tabbing tab defaults to status
 "Codes to Watch" in pairings view
-
-
 
 */
 console.log("\"Tabroom improved\" extension init")
@@ -167,6 +166,7 @@ const codematch = /(\d{3,4})/g // what are code specs? max 5???
 if(stringlocation.includes("/tourn/postings/round.mhtml")) {
     let debate = document.querySelector("thead").innerText.includes("Neg") | document.querySelector("thead").innerText.includes("Aff")
     let header = document.getElementById("tabnav").nextElementSibling.children[0]
+    // header is sometimes undef
     function searchContent(content) {
         let table = document.querySelector('tbody')
         Array.from(table.children).forEach(e => {
@@ -181,6 +181,7 @@ if(stringlocation.includes("/tourn/postings/round.mhtml")) {
         Array.from(table.children).forEach(e => {
             // console.log(content)
             let codes = e.children[3].innerText.match(codematch)
+            // sometimes codes is null (no match???)
             codes.forEach(m => { // m is a single code entered in the field
                 if(content.includes(m)) {
                     // console.log(m)

@@ -1,4 +1,4 @@
-# tabroom.com useability extension
+# tabroom.com usability extension
 extension to tape up a few holes on the tabroom yacht. written as a coach and sometimes tab staff.
 
 official feature list:

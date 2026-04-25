@@ -20,6 +20,8 @@ TODO
 [x] codes to watch in pairings
  [ ] extend to speech chart
 [ ] resize grid cursor comes up on "school dashboard and results" reviewing student ballots
+[ ] search box autofocuses when using collapsed top menu
+[ ] tint finished events green on tab status update (ballot submission)
 
 
 official feature list:
@@ -110,7 +112,9 @@ if(stringlocation.includes("/panel/schemat/show.mhtml")) { // event / round sche
 // "LINK TO EVENT SCHEMAT IN STATUS SCREEN"
 
 if(stringlocation.includes("/tabbing/status/dashboard.mhtml")) {
-    Array.from(document.querySelectorAll("span.centeralign.nospace > h5.centeralign")).forEach(e => {
+    // the first span.centeralign.nospace is the clock; all the .threefifths are the event panels
+    const panelSearchString = "span.threefifths.centeralign.nospace"
+    Array.from(document.querySelectorAll(panelSearchString+" > h5.centeralign")).forEach(e => {
         // looks ugly with text decoration underline. how else can i communicate that it's a link?
         // e.innerText = e.innerText + "⤴"
         // e.innerText = e.innerText + "☍"
@@ -119,6 +123,27 @@ if(stringlocation.includes("/tabbing/status/dashboard.mhtml")) {
 
         // wrap a around existing h5
         e.outerHTML = `<a href="https://tabroom.com/panel/schemat/show.mhtml?event_id=${e.getAttribute('id').replace("_eventName", "")}">${e.outerHTML}</a>`
+    })
+
+// TINT FINISHED EVENTS GREEN (NONFUNCTIONAL)
+// (before the All done! flag shows up. For checking time violations etc)
+    
+    const statusObserver = new MutationObserver(record => { // this callback gets MutationRecord
+        let elem = record[0].target // we're at span.centeralign.nospace here
+        console.log(record)
+        if(elem.getAttribute("id") === "clock") return;
+        // something in here isn't working... the clock is messing with it
+        let threshold = parseInt(elem.querySelector('div.full.nospace.ltborder span[title="Voting Deadline"]'))
+        let current = parseInt(elem.querySelector('div.full.nospace.ltborder span[title="Complete"]'))
+        console.log("status update")
+        console.log(`${current}/${threshold} ${elem.querySelector("a>h5.centeralign").getAttribute('id').replace("_eventName", "")} ballots done`)
+    })
+    Array.from(document.querySelectorAll(panelSearchString)).forEach(element => {
+        console.log(element)
+        statusObserver.observe(element, {
+            subtree: true,
+            childList: true
+        })
     })
 }
 
